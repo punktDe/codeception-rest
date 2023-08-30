@@ -1,0 +1,14 @@
+{
+    "description": "Provides a module and gherkin steps to access the rest module for codeception testing",
+    "name": "punktde/codeception-rest",
+    "license": "GPL-3.0-or-later",
+    "require": {
+        "codeception/codeception": "^5.0",
+        "codeception/module-rest": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PunktDe\\Codeception\\Rest\\": "Classes/"
+      }
+    }
+}
