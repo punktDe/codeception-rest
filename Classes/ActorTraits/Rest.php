@@ -38,7 +38,7 @@ trait Rest
 
         $parameterArray = [];
         foreach ($parameters->getRows() as $index => $row) {
-            $parameterArray[] = [$row[0] => $row[1]];
+            $parameterArray[$row[0]] = $row[1];
         }
 
         $this->send($requestType, $url, $parameterArray);
@@ -65,8 +65,8 @@ trait Rest
     /**
      * @Given the HTTP status code should be :statusCode
      */
-    public function theApiResponseStatusCodeShouldBe(int $statusCode)
+    public function theApiResponseStatusCodeShouldBe(string $statusCode)
     {
-        $this->seeResponseCodeIs($statusCode);
+        $this->seeResponseCodeIs((int)$statusCode);
     }
 }
