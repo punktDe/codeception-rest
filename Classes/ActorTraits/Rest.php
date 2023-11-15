@@ -15,7 +15,7 @@ trait Rest
             'get',
             'post'
         ];
-        
+
         if (!in_array($requestType, $availableTypes)) {
             throw new \Exception('Request type "' . $requestType . '" not yet implemented', 1693489226);
         }
@@ -23,7 +23,7 @@ trait Rest
     }
 
     /**
-    * @Given I do a :requestType request on :url with parameters
+     * @Given I do a :requestType request on :url with parameters
      */
     public function iDoARequestOnWithParameters(string $requestType, string $url, TableNode $parameters)
     {
@@ -31,7 +31,7 @@ trait Rest
             'get',
             'post'
         ];
-        
+
         if (!in_array($requestType, $availableTypes)) {
             throw new \Exception('Request type "' . $requestType . '" not yet implemented', 1693489230);
         }
@@ -68,5 +68,21 @@ trait Rest
     public function theApiResponseStatusCodeShouldBe(string $statusCode)
     {
         $this->seeResponseCodeIs((int)$statusCode);
+    }
+
+    /**
+     * @Given the api response json path :jsonPath equals :value
+     */
+    public function theApiResponseXpathEquals(string $jsonPath, string $value)
+    {
+        $this->seeResponseJsonMatchesJsonPath($jsonPath, $value);
+    }
+
+    /**
+     * @Given the api response json path :jsonPath does not equal :value
+     */
+    public function theApiResponseXpathNotEquals(string $jsonPath, string $value)
+    {
+        $this->dontSeeResponseJsonMatchesJsonPath($jsonPath, $value);
     }
 }
