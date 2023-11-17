@@ -58,6 +58,8 @@ trait Rest
     public function theApiResponseShouldReturnJsonStringWithFields(TableNode $table)
     {
         foreach ($table->getRows() as $index => $row) {
+		    $row[1] = $row[1] === 'true' ? true :  $row[1];
+            $row[1] = $row[1] === 'false' ? false :  $row[1];
             $this->seeResponseContainsJson([$row[0] => $row[1]]);
         }
     }
