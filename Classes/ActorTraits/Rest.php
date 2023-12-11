@@ -87,4 +87,14 @@ trait Rest
     {
         $this->dontSeeResponseJsonMatchesJsonPath($jsonPath, $value);
     }
+
+    /**
+     * Given: the api response should contain headers
+     */
+    public function theApiResponseShouldContainHeaders(TableNode $table)
+    {
+        foreach ($table->getRows() as $row) {
+            $this->seeHttpHeader($row[0], $row[1]);
+        }
+    }
 }
