@@ -89,7 +89,7 @@ trait Rest
     }
 
     /**
-     * Given: the api response should contain headers
+     * @Given the api response should contain headers
      */
     public function theApiResponseShouldContainHeaders(TableNode $table)
     {
