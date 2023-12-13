@@ -3,6 +3,7 @@
 namespace PunktDe\Codeception\Rest\ActorTraits;
 
 use Behat\Gherkin\Node\TableNode;
+use PHPUnit\Framework\Assert;
 
 trait Rest
 {
@@ -72,12 +73,18 @@ trait Rest
         $this->seeResponseCodeIs((int)$statusCode);
     }
 
+
     /**
      * @Given the api response json path :jsonPath equals :value
      */
-    public function theApiResponseXpathEquals(string $jsonPath, string $value)
+    public function theApiResponseJsonPathFieldIsEqual(string $jsonPath, string $value)
     {
-        $this->seeResponseJsonMatchesJsonPath($jsonPath, $value);
+        $data = $this->grabDataFromResponseByJsonPath($jsonPath);
+        Assert::assertEquals(
+            $value,
+            $data[0],
+            sprintf('Value of json path %s is not equal expected %s actual %s', $jsonPath, $value, $data[0])
+        );
     }
 
     /**
