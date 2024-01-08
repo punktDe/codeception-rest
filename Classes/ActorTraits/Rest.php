@@ -14,7 +14,9 @@ trait Rest
     {
         $availableTypes = [
             'get',
-            'post'
+            'post',
+            'delete',
+            'patch'
         ];
 
         if (!in_array($requestType, $availableTypes)) {
@@ -30,7 +32,9 @@ trait Rest
     {
         $availableTypes = [
             'get',
-            'post'
+            'post',
+            'delete',
+            'patch'
         ];
 
         if (!in_array($requestType, $availableTypes)) {
