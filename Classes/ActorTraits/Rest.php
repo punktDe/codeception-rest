@@ -65,6 +65,7 @@ trait Rest
         foreach ($table->getRows() as $index => $row) {
             $row[1] = $row[1] === 'true' ? true : $row[1];
             $row[1] = $row[1] === 'false' ? false : $row[1];
+            $row[1] = $row[1] === 'null' ? null : $row[1];
             $this->seeResponseContainsJson([$row[0] => $row[1]]);
         }
     }
@@ -84,6 +85,7 @@ trait Rest
     public function theApiResponseJsonPathFieldIsEqual(string $jsonPath, string $value)
     {
         $data = $this->grabDataFromResponseByJsonPath($jsonPath);
+        $value = $value === 'null' ? null : $value;
         Assert::assertEquals(
             $value,
             $data[0],
