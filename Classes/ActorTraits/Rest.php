@@ -93,6 +93,7 @@ trait Rest
         );
     }
 
+    
     /**
      * @Given the api response json path :jsonPath does not equal :value
      */
@@ -101,6 +102,7 @@ trait Rest
         $this->dontSeeResponseJsonMatchesJsonPath($jsonPath, $value);
     }
 
+    
     /**
      * @Given the api response should contain headers
      */
@@ -108,6 +110,36 @@ trait Rest
     {
         foreach ($table->getRows() as $row) {
             $this->seeHttpHeader($row[0], $row[1]);
+        }
+    }
+
+    
+    /**
+     * @Given the api response equals :value
+     */
+    public function theApiResponseEquals(string $value)
+    {
+        $actual = $this->grabResponse();
+        Assert::assertEquals(
+            $value,
+            $actual,
+            sprintf('Value of content is not equal expected %s actual %s', $value, $actual)
+        );
+    }
+
+     /**
+     * @Given the api response should return a JSON string with json path
+     */
+    public function theApiResponseShouldReturnStringWithJsonPath(TableNode $table)
+    {
+        foreach ($table->getRows() as $index => $row) {
+            $data = $this->grabDataFromResponseByJsonPath($row[0]);
+
+            Assert::assertEquals(
+                $row[1],
+                $data[0],
+                sprintf('Value of json path %s is not equal expected %s actual %s', $row[0], $row[1], $data[0])
+            );
         }
     }
 }
