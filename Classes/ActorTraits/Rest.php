@@ -142,12 +142,4 @@ trait Rest
             );
         }
     }
-    
-    /**
-     * @Given the process sleeps for :seconds seconds
-     */
-    public function theProcessSleepsForSeconds(string $sconds)
-    {
-        sleep((int)$seconds);
-    }
 }
