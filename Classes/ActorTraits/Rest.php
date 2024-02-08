@@ -134,6 +134,8 @@ trait Rest
         foreach ($table->getRows() as $index => $row) {
             $data = $this->grabDataFromResponseByJsonPath($row[0]);
 
+            $row[1] = $this->convertStringToValue($row[1]);
+
             Assert::assertEquals(
                 $row[1],
                 $data[0],
