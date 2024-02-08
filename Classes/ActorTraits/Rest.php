@@ -84,7 +84,7 @@ trait Rest
     public function theApiResponseJsonPathFieldIsEqual(string $jsonPath, string $value)
     {
         $data = $this->grabDataFromResponseByJsonPath($jsonPath);
-        $row[1] = $this->convertStringToValue($row[1]);
+        $value = $this->convertStringToValue($value);
         Assert::assertEquals(
             $value,
             $data[0],
