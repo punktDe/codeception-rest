@@ -43,6 +43,7 @@ trait Rest
 
         $parameterArray = [];
         foreach ($parameters->getRows() as $index => $row) {
+            $row[1] = $this->convertStringToValue($row[1]);
             $parameterArray[$row[0]] = $row[1];
         }
 
@@ -63,9 +64,7 @@ trait Rest
     public function theApiResponseShouldReturnJsonStringWithFields(TableNode $table)
     {
         foreach ($table->getRows() as $index => $row) {
-            $row[1] = $row[1] === 'true' ? true : $row[1];
-            $row[1] = $row[1] === 'false' ? false : $row[1];
-            $row[1] = $row[1] === 'null' ? null : $row[1];
+            $row[1] = $this->convertStringToValue($row[1]);
             $this->seeResponseContainsJson([$row[0] => $row[1]]);
         }
     }
@@ -85,7 +84,7 @@ trait Rest
     public function theApiResponseJsonPathFieldIsEqual(string $jsonPath, string $value)
     {
         $data = $this->grabDataFromResponseByJsonPath($jsonPath);
-        $value = $value === 'null' ? null : $value;
+        $row[1] = $this->convertStringToValue($row[1]);
         Assert::assertEquals(
             $value,
             $data[0],
@@ -141,5 +140,18 @@ trait Rest
                 sprintf('Value of json path %s is not equal expected %s actual %s', $row[0], $row[1], $data[0])
             );
         }
+    }
+
+    
+    /**
+     * @param string $value
+     * @return mixed
+     */
+    protected function convertStringToValue(string $value): mixed
+    {
+        $value = $value === 'true' ? true : $value;
+        $value = $value === 'false' ? false : $value;
+        $value = $value === 'null' ? null : $value;
+        return $value;
     }
 }
