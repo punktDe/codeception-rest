@@ -139,7 +139,12 @@ trait Rest
             Assert::assertEquals(
                 $row[1],
                 $data[0],
-                sprintf('Value of json path %s is not equal expected %s actual %s', $row[0], $row[1], $data[0])
+                 sprintf(
+                    'Value of json path %s is not equal expected %s actual %s',
+                    $row[0],
+                    var_export($row[1], true),
+                    var_export($data[0], true)
+                )
             );
         }
     }
@@ -154,6 +159,8 @@ trait Rest
         $value = $value === 'true' ? true : $value;
         $value = $value === 'false' ? false : $value;
         $value = $value === 'null' ? null : $value;
+        $value = $value === '""' ? "" : $value;
+        $value = $value === '[]' ? [] : $value;
         return $value;
     }
 }
