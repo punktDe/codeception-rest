@@ -41,13 +41,19 @@ trait Rest
             throw new \Exception('Request type "' . $requestType . '" not yet implemented', 1693489230);
         }
 
-        $parameterArray = [];
+        $files = [];
         foreach ($parameters->getRows() as $index => $row) {
-            $row[1] = $this->convertStringToValue($row[1]);
-            $parameterArray[$row[0]] = $row[1];
-        }
+            if (strncmp($row[0], '$_FILES.', strlen('$_FILES.')) === 0) {
+                $row[0] = substr($row[0], strlen('$FILES.') + 1);
+                $files[] = [$row[0] => $row[1]];
 
-        $this->send($requestType, $url, $parameterArray);
+            } else {
+                $row[1] = $this->convertStringToValue($row[1]);
+                $parameterArray[$row[0]] = $row[1];
+            }
+        }
+        $this->deleteHeader('Content-Type');
+        $this->send($requestType, $url, $parameterArray, $files);
     }
 
     /**
