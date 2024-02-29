@@ -26,6 +26,8 @@ trait Rest
     }
 
     /**
+     * by adding a parameter starting with "$FILES.", it is possible to upload files
+     *
      * @Given I do a :requestType request on :url with parameters
      */
     public function iDoARequestOnWithParameters(string $requestType, string $url, TableNode $parameters)
@@ -52,7 +54,9 @@ trait Rest
                 $parameterArray[$row[0]] = $row[1];
             }
         }
-        $this->deleteHeader('Content-Type');
+        if (count($files) > 0) {
+            $this->deleteHeader('Content-Type');
+        }
         $this->send($requestType, $url, $parameterArray, $files);
     }
 
