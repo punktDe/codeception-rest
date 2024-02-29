@@ -26,6 +26,8 @@ trait Rest
     }
 
     /**
+     * by adding a parameter starting with "$_FILES.", it is possible to upload files
+     *
      * @Given I do a :requestType request on :url with parameters
      */
     public function iDoARequestOnWithParameters(string $requestType, string $url, TableNode $parameters)
@@ -41,13 +43,21 @@ trait Rest
             throw new \Exception('Request type "' . $requestType . '" not yet implemented', 1693489230);
         }
 
-        $parameterArray = [];
+        $files = [];
         foreach ($parameters->getRows() as $index => $row) {
-            $row[1] = $this->convertStringToValue($row[1]);
-            $parameterArray[$row[0]] = $row[1];
-        }
+            if (strncmp($row[0], '$_FILES.', strlen('$_FILES.')) === 0) {
+                $row[0] = substr($row[0], strlen('$_FILES.'));
+                $files[] = [$row[0] => $row[1]];
 
-        $this->send($requestType, $url, $parameterArray);
+            } else {
+                $row[1] = $this->convertStringToValue($row[1]);
+                $parameterArray[$row[0]] = $row[1];
+            }
+        }
+        if (count($files) > 0) {
+            $this->deleteHeader('Content-Type');
+        }
+        $this->send($requestType, $url, $parameterArray, $files);
     }
 
     /**
