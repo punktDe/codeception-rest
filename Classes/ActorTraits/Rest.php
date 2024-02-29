@@ -26,7 +26,7 @@ trait Rest
     }
 
     /**
-     * by adding a parameter starting with "$FILES.", it is possible to upload files
+     * by adding a parameter starting with "$_FILES.", it is possible to upload files
      *
      * @Given I do a :requestType request on :url with parameters
      */
@@ -46,7 +46,7 @@ trait Rest
         $files = [];
         foreach ($parameters->getRows() as $index => $row) {
             if (strncmp($row[0], '$_FILES.', strlen('$_FILES.')) === 0) {
-                $row[0] = substr($row[0], strlen('$FILES.') + 1);
+                $row[0] = substr($row[0], strlen('$_FILES.'));
                 $files[] = [$row[0] => $row[1]];
 
             } else {
