@@ -102,7 +102,7 @@ trait Rest
         );
     }
 
-    
+
     /**
      * @Given the api response json path :jsonPath does not equal :value
      */
@@ -111,7 +111,7 @@ trait Rest
         $this->dontSeeResponseJsonMatchesJsonPath($jsonPath, $value);
     }
 
-    
+
     /**
      * @Given the api response should contain headers
      */
@@ -122,7 +122,7 @@ trait Rest
         }
     }
 
-    
+
     /**
      * @Given the api response equals :value
      */
@@ -159,7 +159,26 @@ trait Rest
         }
     }
 
-    
+
+    /**
+     * @And I do not see :text in response
+     * @Given I do not see :text in response
+     */
+    public function iDontSeeResponseContainsText(string $text)
+    {
+        $this->dontSeeResponseContains($text);
+    }
+
+    /**
+     * @And I see :text in response
+     * @Given I see :text in response
+     */
+    public function iSeeResponseContainsText(string $text)
+    {
+        $this->seeResponseContains($text);
+    }
+
+
     /**
      * @param string $value
      * @return mixed
