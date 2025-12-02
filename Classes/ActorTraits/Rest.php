@@ -207,10 +207,6 @@ trait Rest
 
 
     /**
-     * @param string $value
-     * @return mixed
-     */
-    /**
      * @Then  /^the api response contains arrays with length of$/
      */
     public function apiResponseContainsArraysWithLengthOf(TableNode $lengthsTable)
