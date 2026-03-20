@@ -8,6 +8,18 @@ use PHPUnit\Framework\Assert;
 trait Rest
 {
     /**
+     * Normalize a possibly plain path to a JSONPath understood by Codeception
+     */
+    protected function normalizeJsonPath(string $path): string
+    {
+        $path = trim($path);
+        if ($path === '$' || strpos($path, '$') === 0) {
+            return $path;
+        }
+        // allow top-level key without dot
+        return '$.' . ltrim($path, '.');
+    }
+    /**
      * @Given I do a :requestType request on :url
      */
     public function iDoARequestOn(string $requestType, string $url)
@@ -192,4 +204,119 @@ trait Rest
         $value = $value === '[]' ? [] : $value;
         return $value;
     }
+
+
+    /**
+     * @Then  /^the api response contains arrays with length of$/
+     */
+    public function apiResponseContainsArraysWithLengthOf(TableNode $lengthsTable)
+    {
+        foreach ($lengthsTable->getRows() as $row) {
+            $path = $row[0];
+            $len = $row[1];
+            $jsonPath = $this->normalizeJsonPath($path);
+            $matches = $this->grabDataFromResponseByJsonPath($jsonPath);
+            Assert::assertNotEmpty($matches, sprintf('Path %s did not match any value in response', $jsonPath));
+            $array = $matches[0];
+            Assert::assertIsArray($array, sprintf('Value at %s is not an array', $jsonPath));
+            Assert::assertCount((int)$len, $array, sprintf('Array at %s does not have expected length %d, actual %d', $jsonPath, (int)$len, is_array($array) ? count($array) : -1));
+        }
+    }
+
+    /**
+     * @Then the api response array in json path :jsonPath with subpath :subPath equals :value
+     */
+    public function apiResponseArrayInJsonPathWithSubpathEquals(string $jsonPath, string $subPath, string $value)
+    {
+        $this->assertArrayHasItemWithSubpathValue($jsonPath, $subPath, $this->convertStringToValue($value), true);
+    }
+
+    /**
+     * @Then the api response array in json path :jsonPath with subpath :subPath does not equal :value
+     */
+    public function apiResponseArrayInJsonPathWithSubpathDoesNotEqual(string $jsonPath, string $subPath, string $value)
+    {
+        $this->assertArrayHasItemWithSubpathValue($jsonPath, $subPath, $this->convertStringToValue($value), false);
+    }
+
+    /**
+     * @Then  /^the api response should return a JSON string with json path arrays containing strings$/
+     */
+    public function apiResponseShouldReturnJsonStringWithJsonPathArraysContainingStrings(TableNode $valuesTable)
+    {
+        foreach ($valuesTable->getRows() as $row) {
+            $path = $row[0];
+            $subPath = $row[1];
+            $expected = $row[2];
+            $this->assertArrayHasItemWithSubpathValue($path, $subPath, $this->convertStringToValue($expected), true);
+        }
+    }
+
+    /**
+     * @Then the api response contains an array at json path :jsonPath with length :length
+     */
+    public function apiResponseContainsArrayAtJsonPathWithLength(string $jsonPath, string $length)
+    {
+        $jsonPath = $this->normalizeJsonPath($jsonPath);
+        $matches = $this->grabDataFromResponseByJsonPath($jsonPath);
+        Assert::assertNotEmpty($matches, sprintf('Path %s did not match any value in response', $jsonPath));
+        $array = $matches[0];
+        Assert::assertIsArray($array, sprintf('Value at %s is not an array', $jsonPath));
+        Assert::assertCount((int)$length, $array, sprintf('Array at %s does not have expected length %d, actual %d', $jsonPath, (int)$length, is_array($array) ? count($array) : -1));
+    }
+
+    /**
+     * @Then the api response in json path :jsonPath is empty
+     */
+    public function apiResponseJsonPathIsEmpty(string $jsonPath)
+    {
+        $normalized = $this->normalizeJsonPath($jsonPath);
+
+        // determine parent path
+        $parent = '$';
+        $path = ltrim($normalized, '$.');
+        if (strpos($path, '.') !== false) {
+            $parent = '$.' . substr($path, 0, strrpos($path, '.'));
+        }
+
+        $parentMatches = $this->grabDataFromResponseByJsonPath($parent);
+        Assert::assertNotEmpty($parentMatches, sprintf('Parent path %s does not exist', $parent));
+
+        $matches = $this->grabDataFromResponseByJsonPath($normalized);
+        if (empty($matches)) {
+            // treat non-existing as empty when parent exists
+            Assert::assertTrue(true);
+            return;
+        }
+        $value = $matches[0];
+        $isEmpty = ($value === null) || ($value === '') || (is_array($value) && count($value) === 0);
+        Assert::assertTrue($isEmpty, sprintf('Failed asserting that path "%s" is empty. Actual: %s', $normalized, is_array($value) ? 'Array[' . count($value) . ']' : var_export($value, true)));
+    }
+
+    /**
+     * Helper to assert item with subpath/value exists or not in array at jsonPath
+     */
+    protected function assertArrayHasItemWithSubpathValue(string $jsonPath, string $subPath, $expectedValue, bool $shouldExist)
+    {
+        $jsonPath = $this->normalizeJsonPath($jsonPath);
+        $matches = $this->grabDataFromResponseByJsonPath($jsonPath);
+        Assert::assertNotEmpty($matches, sprintf('Path %s did not match any value in response', $jsonPath));
+        $array = $matches[0];
+        Assert::assertIsArray($array, sprintf('Value at %s is not an array', $jsonPath));
+
+        $found = false;
+        foreach ($array as $item) {
+            if (is_array($item) && array_key_exists($subPath, $item) && $item[$subPath] == $expectedValue) {
+                $found = true;
+                break;
+            }
+        }
+
+        if ($shouldExist) {
+            Assert::assertTrue($found, sprintf('Array at %s does not contain an item with %s == %s', $jsonPath, $subPath, var_export($expectedValue, true)));
+        } else {
+            Assert::assertFalse($found, sprintf('Array at %s unexpectedly contains an item with %s == %s', $jsonPath, $subPath, var_export($expectedValue, true)));
+        }
+    }
+
 }
